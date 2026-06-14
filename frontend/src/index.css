@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* KaTeX display math centering */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+}

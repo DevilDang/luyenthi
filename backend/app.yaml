@@ -1,0 +1,22 @@
+runtime: go122
+instance_class: F2
+
+env_variables:
+  APP_ENV: "production"
+  GOOGLE_CLOUD_PROJECT: "your-project-id"
+  ALLOWED_ORIGINS: "https://your-frontend-domain.com"
+  # JWT_SECRET and GOOGLE_CLIENT_ID are loaded from Secret Manager at startup
+
+handlers:
+  - url: /.*
+    script: auto
+    secure: always
+
+automatic_scaling:
+  min_instances: 1
+  max_instances: 10
+  target_cpu_utilization: 0.65
+  max_concurrent_requests: 80
+
+inbound_services:
+  - warmup
