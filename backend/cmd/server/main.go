@@ -80,6 +80,7 @@ func main() {
 			// Exams
 			r.Get("/api/admin/exams", h.AdminListExams)
 			r.Post("/api/admin/exams", h.AdminCreateExam)
+			r.Post("/api/admin/exams/import", h.AdminImportExam)
 			r.Get("/api/admin/exams/{examID}", h.AdminGetExam)
 			r.Put("/api/admin/exams/{examID}", h.AdminUpdateExam)
 			r.Delete("/api/admin/exams/{examID}", h.AdminDeleteExam)

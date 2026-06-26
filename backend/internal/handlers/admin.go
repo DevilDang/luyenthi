@@ -117,6 +117,76 @@ func (h *Handler) AdminCreateExam(w http.ResponseWriter, r *http.Request) {
 	response.Created(w, req)
 }
 
+func (h *Handler) AdminImportExam(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Title         string            `json:"title"`
+		Description   string            `json:"description"`
+		Subject       string            `json:"subject"`
+		SubjectDetail string            `json:"subject_detail"`
+		GradeLevel    string            `json:"grade_level"`
+		TimeLimitMin  int               `json:"time_limit_min"`
+		Questions     []models.Question `json:"questions"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		response.Error(w, http.StatusBadRequest, "invalid JSON body")
+		return
+	}
+	if req.Title == "" {
+		response.Error(w, http.StatusBadRequest, "title is required")
+		return
+	}
+	if req.TimeLimitMin <= 0 {
+		response.Error(w, http.StatusBadRequest, "time_limit_min must be > 0")
+		return
+	}
+
+	ctx := r.Context()
+	now := time.Now()
+
+	totalPoints := 0.0
+	for _, q := range req.Questions {
+		totalPoints += q.Points
+	}
+
+	exam := models.Exam{
+		Title:         req.Title,
+		Description:   req.Description,
+		Subject:       req.Subject,
+		SubjectDetail: req.SubjectDetail,
+		GradeLevel:    req.GradeLevel,
+		TimeLimitMin:  req.TimeLimitMin,
+		TotalPoints:   totalPoints,
+		QuestionCount: len(req.Questions),
+		CreatedBy:     h.userID(r),
+		IsPublished:   false,
+		CreatedAt:     now,
+		UpdatedAt:     now,
+	}
+
+	examRef, _, err := h.db.Collection("exams").Add(ctx, exam)
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "failed to create exam")
+		return
+	}
+	exam.ID = examRef.ID
+
+	if len(req.Questions) > 0 {
+		batch := h.db.Batch()
+		for _, q := range req.Questions {
+			q.CreatedAt = now
+			qRef := h.db.Collection("exams").Doc(examRef.ID).Collection("questions").NewDoc()
+			q.ID = qRef.ID
+			batch.Set(qRef, q)
+		}
+		if _, err := batch.Commit(ctx); err != nil {
+			response.Error(w, http.StatusInternalServerError, "failed to import questions")
+			return
+		}
+	}
+
+	response.Created(w, exam)
+}
+
 func (h *Handler) AdminUpdateExam(w http.ResponseWriter, r *http.Request) {
 	examID := chi.URLParam(r, "examID")
 	var req models.Exam

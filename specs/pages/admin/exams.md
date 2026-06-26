@@ -17,7 +17,7 @@ List all exams (including unpublished drafts), create new exams, toggle publish 
 ```
 ┌─ Navbar ───────────────────────────────────────────────────┐
 ├────────────────────────────────────────────────────────────┤
-│  Quản lý đề thi                           [+ Tạo đề thi]  │
+│  Quản lý đề thi             [Import JSON]  [+ Tạo đề thi]  │
 │                                                             │
 │  ┌──────────────────────────────────────────────────────┐  │
 │  │ Tên đề          │ Môn   │ Lớp   │ Câu │ Trạng thái  │  │
@@ -116,12 +116,23 @@ Clicking "+ Tạo đề thi" navigates to a dedicated full-page form.
 
 ---
 
+## Import Flow
+
+1. Click "Import JSON" button → triggers a hidden `<input type="file" accept=".json">`.
+2. User selects a `.json` file matching the import schema (see `specs/api/admin.md#post-apiadminexamsimport`).
+3. Frontend reads the file with `FileReader`, parses JSON, then `POST /api/admin/exams/import`.
+4. On success: invalidate exam list (new exam appears as Draft), show brief success message.
+5. On error: show error message inline (invalid JSON format or server error).
+
+---
+
 ## Data
 
 | API Call                          | Trigger             |
 |-----------------------------------|---------------------|
 | `GET /api/admin/exams`            | On mount            |
 | `POST /api/admin/exams`           | Create page save    |
+| `POST /api/admin/exams/import`    | Import file select  |
 | `DELETE /api/admin/exams/{id}`    | Delete confirm      |
 | `PUT /api/admin/exams/{id}/publish` | Badge click      |
 

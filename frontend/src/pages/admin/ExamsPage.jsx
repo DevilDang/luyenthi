@@ -1,11 +1,15 @@
+import { useRef, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
-import { adminListExams, adminDeleteExam, adminTogglePublish } from '../../api/admin'
+import { adminListExams, adminDeleteExam, adminTogglePublish, adminImportExam } from '../../api/admin'
 import LoadingSpinner from '../../components/common/LoadingSpinner'
 
 export default function ExamsPage() {
   const qc = useQueryClient()
   const { data, isLoading } = useQuery({ queryKey: ['admin-exams'], queryFn: adminListExams })
+  const fileInputRef = useRef(null)
+  const [importError, setImportError] = useState('')
+  const [importing, setImporting] = useState(false)
 
   const deleteMut = useMutation({
     mutationFn: adminDeleteExam,
@@ -23,19 +27,68 @@ export default function ExamsPage() {
     }
   }
 
+  const handleImportFile = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    setImportError('')
+    setImporting(true)
+
+    let payload
+    try {
+      const text = await file.text()
+      payload = JSON.parse(text.replace(/^﻿/, ''))
+    } catch {
+      setImportError('The file is not valid JSON. Please check the file format.')
+      setImporting(false)
+      return
+    }
+
+    try {
+      await adminImportExam(payload)
+      qc.invalidateQueries(['admin-exams'])
+    } catch (err) {
+      setImportError(err?.response?.data?.error || 'Import failed. Please try again.')
+    } finally {
+      setImporting(false)
+    }
+  }
+
   const exams = data?.exams || []
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Exam Management</h1>
-        <Link
-          to="/admin/exams/new"
-          className="bg-brand-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-brand-700 transition-colors"
-        >
-          + New Exam
-        </Link>
+        <div className="flex items-center gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            className="hidden"
+            onChange={handleImportFile}
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={importing}
+            className="border border-gray-300 text-gray-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-gray-50 disabled:opacity-50 transition-colors"
+          >
+            {importing ? 'Importing…' : 'Import JSON'}
+          </button>
+          <Link
+            to="/admin/exams/new"
+            className="bg-brand-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-brand-700 transition-colors"
+          >
+            + New Exam
+          </Link>
+        </div>
       </div>
+
+      {importError && (
+        <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
+          {importError}
+        </div>
+      )}
 
       {isLoading ? <LoadingSpinner /> : exams.length === 0 ? (
         <div className="text-center py-16 text-gray-400">

@@ -29,6 +29,9 @@ export const adminDeleteExam = (examID) =>
 export const adminTogglePublish = (examID) =>
   client.put(`/api/admin/exams/${examID}/publish`).then((r) => r.data)
 
+export const adminImportExam = (data) =>
+  client.post('/api/admin/exams/import', data).then((r) => r.data)
+
 // ── Questions ──────────────────────────────────────────────────────────────
 export const adminAddQuestion = (examID, data) =>
   client.post(`/api/admin/exams/${examID}/questions`, data).then((r) => r.data)

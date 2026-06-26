@@ -206,6 +206,74 @@ Delete an exam and all its questions (cascade).
 
 ---
 
+### POST /api/admin/exams/import
+
+Import a complete exam (metadata + all questions) from a JSON payload.
+
+**Request**
+
+```json
+{
+  "title": "Toán lớp 10 - Đại số Chương 1",
+  "description": "Bài kiểm tra về tập hợp và mệnh đề",
+  "subject": "mathematics",
+  "subject_detail": "Đại số",
+  "grade_level": "grade-10",
+  "time_limit_min": 45,
+  "questions": [
+    {
+      "order": 1,
+      "type": "single_choice",
+      "content": "Mệnh đề nào sau đây là đúng?",
+      "points": 0.5,
+      "options": [
+        { "id": "opt_a", "content": "A. $x^2 \\geq 0$" },
+        { "id": "opt_b", "content": "B. $x^2 > 0$" }
+      ],
+      "correct_option_ids": ["opt_a"],
+      "correct_answers": [],
+      "explanation": "Bình phương của mọi số thực đều không âm."
+    }
+  ]
+}
+```
+
+| Field            | Type        | Required | Notes                               |
+|------------------|-------------|----------|-------------------------------------|
+| `title`          | string      | yes      |                                     |
+| `description`    | string      | no       |                                     |
+| `subject`        | string      | yes      | Subject enum                        |
+| `subject_detail` | string      | no       |                                     |
+| `grade_level`    | string      | yes      | Grade level enum                    |
+| `time_limit_min` | int         | yes      | Must be > 0                         |
+| `questions`      | []Question  | no       | Same shape as POST /questions       |
+
+**Behaviour:**
+- Creates the exam as a **draft** (`is_published=false`).
+- Writes all questions as a Firestore batch, then recomputes `question_count` and `total_points` on the exam doc.
+
+**Response `201 Created`**
+
+```json
+{
+  "id": "exam_abc",
+  "title": "...",
+  "question_count": 10,
+  ...
+}
+```
+
+**Error Responses**
+
+| Status | Condition                                      |
+|--------|------------------------------------------------|
+| 400    | Invalid JSON, missing required fields          |
+| 401    | Missing/invalid JWT                            |
+| 403    | Caller is not admin                            |
+| 500    | Firestore write error                          |
+
+---
+
 ### PUT /api/admin/exams/{examID}/publish
 
 Toggle `is_published` between `true` and `false`.
