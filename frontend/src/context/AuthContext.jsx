@@ -11,6 +11,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(firebaseAuth, async (firebaseUser) => {
+      setLoading(true)
       if (!firebaseUser) {
         localStorage.removeItem('token')
         setUser(null)

@@ -13,7 +13,9 @@ import ResultPage from '../pages/exam/ResultPage'
 import ProfilePage from '../pages/profile/ProfilePage'
 import UsersPage from '../pages/admin/UsersPage'
 import ExamsPage from '../pages/admin/ExamsPage'
+import CreateExamPage from '../pages/admin/CreateExamPage'
 import ExamEditPage from '../pages/admin/ExamEditPage'
+import QuestionEditorPage from '../pages/admin/QuestionEditorPage'
 
 function Layout({ children }) {
   return (
@@ -41,7 +43,11 @@ export default function AppRouter() {
       <Route path="/admin" element={<Navigate to="/admin/exams" replace />} />
       <Route path="/admin/users" element={<AdminRoute><Layout><UsersPage /></Layout></AdminRoute>} />
       <Route path="/admin/exams" element={<AdminRoute><Layout><ExamsPage /></Layout></AdminRoute>} />
+      {/* /new must come before /:examID so React Router matches it as static */}
+      <Route path="/admin/exams/new" element={<AdminRoute><Layout><CreateExamPage /></Layout></AdminRoute>} />
       <Route path="/admin/exams/:examID" element={<AdminRoute><Layout><ExamEditPage /></Layout></AdminRoute>} />
+      <Route path="/admin/exams/:examID/questions/new" element={<AdminRoute><Layout><QuestionEditorPage /></Layout></AdminRoute>} />
+      <Route path="/admin/exams/:examID/questions/:qID/edit" element={<AdminRoute><Layout><QuestionEditorPage /></Layout></AdminRoute>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

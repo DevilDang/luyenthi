@@ -14,6 +14,9 @@ export const adminDeleteUser = (userID) =>
 export const adminListExams = () =>
   client.get('/api/admin/exams').then((r) => r.data)
 
+export const adminGetExam = (examID) =>
+  client.get(`/api/admin/exams/${examID}`).then((r) => r.data)
+
 export const adminCreateExam = (data) =>
   client.post('/api/admin/exams', data).then((r) => r.data)
 

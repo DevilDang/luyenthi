@@ -1,4 +1,4 @@
-import MathRenderer from '../math/MathRenderer'
+import { MarkdownPreview } from '../editor/MarkdownEditor'
 import AnswerInput from './AnswerInput'
 
 export default function QuestionCard({ question, index, answer, onChange, disabled, result }) {
@@ -22,7 +22,7 @@ export default function QuestionCard({ question, index, answer, onChange, disabl
       </div>
 
       <div className="text-sm text-gray-800 leading-relaxed">
-        <MathRenderer content={question.content} />
+        <MarkdownPreview source={question.content} />
       </div>
 
       <AnswerInput

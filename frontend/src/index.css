@@ -1,9 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* KaTeX display math centering */
+@layer base {
+  html {
+    font-family: 'Nunito', ui-rounded, sans-serif;
+  }
+
+  body {
+    background: linear-gradient(135deg, #e8f7fd 0%, #f0f9ff 50%, #ffffff 100%);
+    background-attachment: fixed;
+    color: #004265;
+  }
+}
+
+@layer components {
+  /* Primary pill button */
+  .btn-primary {
+    @apply rounded-full bg-doraemon-500 px-6 py-2.5 font-bold text-white shadow-btn
+           transition-all duration-200 hover:bg-doraemon-600 hover:scale-105
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+  }
+
+  /* Outlined secondary button */
+  .btn-secondary {
+    @apply rounded-full border-2 border-doraemon-400 px-6 py-2.5 font-bold text-doraemon-600
+           transition-all duration-200 hover:bg-doraemon-50 hover:scale-105
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Danger button */
+  .btn-danger {
+    @apply rounded-full bg-accent-red px-6 py-2.5 font-bold text-white
+           transition-all duration-200 hover:opacity-90 hover:scale-105
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Card */
+  .card {
+    @apply rounded-3xl bg-white border border-doraemon-100 p-6 shadow-card
+           transition-all duration-300;
+  }
+
+  .card-hover {
+    @apply hover:shadow-card-hover hover:-translate-y-1;
+  }
+
+  /* Text input */
+  .input {
+    @apply w-full rounded-2xl border-2 border-doraemon-200 bg-doraemon-50 px-4 py-2.5
+           font-semibold text-doraemon-800 placeholder-doraemon-300
+           outline-none transition-all duration-200
+           focus:border-doraemon-500 focus:ring-2 focus:ring-doraemon-200;
+  }
+
+  /* Subject badge chip */
+  .badge {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-bold;
+  }
+
+  .badge-math    { @apply bg-doraemon-100 text-doraemon-700; }
+  .badge-science { @apply bg-green-100 text-green-700; }
+  .badge-social  { @apply bg-yellow-100 text-yellow-700; }
+  .badge-admin   { @apply bg-accent-red text-white; }
+}
+
+/* KaTeX display math */
 .katex-display {
   overflow-x: auto;
   overflow-y: hidden;
+}
+
+/* ── Page enter ─────────────────────────────────────────────────── */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-enter { animation: fadeSlideUp 0.35s ease-out both; }
+
+/* ── Login page animations ──────────────────────────────────────── */
+
+/* Clouds drifting across the sky */
+@keyframes cloudDrift {
+  from { transform: translateX(-140%); }
+  to   { transform: translateX(110vw); }
+}
+.login-cloud {
+  animation: cloudDrift linear infinite;
+}
+
+/* Characters bobbing up/down */
+@keyframes bobFloat {
+  0%, 100% { transform: translateY(0px)   rotate(-2deg); }
+  50%       { transform: translateY(-12px) rotate(2deg);  }
+}
+.login-bob {
+  animation: bobFloat 3.2s ease-in-out infinite;
+}
+
+/* Stars twinkling */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.75); }
+  50%       { opacity: 1;    transform: scale(1.15); }
+}
+.login-star {
+  animation: twinkle 2.4s ease-in-out infinite;
 }

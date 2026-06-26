@@ -41,7 +41,7 @@ func Grade(questions []models.Question, inputs []models.AnswerInput) Result {
 		}
 
 		switch q.Type {
-		case models.TypeMultipleChoice:
+		case models.TypeSingleChoice, models.TypeMultipleChoice:
 			correct := checkOptions(input.AnswerOptions, q.CorrectOptionIDs)
 			ar.IsCorrect = &correct
 			if correct {

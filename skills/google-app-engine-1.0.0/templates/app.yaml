@@ -1,0 +1,47 @@
+# Google App Engine - Standard Environment (Go + Firestore)
+# Copy to your project root and customize
+
+runtime: go126
+instance_class: F2
+
+# Environment variables (NOT for secrets - use Secret Manager)
+env_variables:
+  APP_ENV: "production"
+  GOOGLE_CLOUD_PROJECT: "your-project-id"
+
+# Request handlers
+handlers:
+  - url: /static
+    static_dir: static/
+    secure: always
+    expiration: "1d"
+
+  - url: /.*
+    script: auto
+    secure: always
+
+# Scaling configuration
+automatic_scaling:
+  min_instances: 0
+  max_instances: 10
+  target_cpu_utilization: 0.65
+  max_concurrent_requests: 80
+
+# Health checks
+liveness_check:
+  path: "/_ah/health"
+  check_interval_sec: 30
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2
+
+readiness_check:
+  path: "/_ah/health"
+  check_interval_sec: 5
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2
+
+# Warmup requests
+inbound_services:
+  - warmup

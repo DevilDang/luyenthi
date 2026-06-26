@@ -17,6 +17,7 @@ const (
 
 // Question types
 const (
+	TypeSingleChoice   = "single_choice"
 	TypeMultipleChoice = "multiple_choice"
 	TypeShortAnswer    = "short_answer"
 	TypeEssay          = "essay"

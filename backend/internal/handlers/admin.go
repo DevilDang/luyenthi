@@ -186,6 +186,35 @@ func (h *Handler) AdminPublishToggle(w http.ResponseWriter, r *http.Request) {
 	response.OK(w, map[string]any{"is_published": newState})
 }
 
+func (h *Handler) AdminGetExam(w http.ResponseWriter, r *http.Request) {
+	examID := chi.URLParam(r, "examID")
+	ctx := r.Context()
+
+	snap, err := h.db.Collection("exams").Doc(examID).Get(ctx)
+	if err != nil {
+		if status.Code(err) == codes.NotFound {
+			response.Error(w, http.StatusNotFound, "exam not found")
+		} else {
+			response.Error(w, http.StatusInternalServerError, "failed to fetch exam")
+		}
+		return
+	}
+	var exam models.Exam
+	if err := snap.DataTo(&exam); err != nil {
+		response.Error(w, http.StatusInternalServerError, "failed to read exam")
+		return
+	}
+	exam.ID = snap.Ref.ID
+
+	questions, err := fetchQuestionsOrdered(ctx, h.db, examID)
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "failed to fetch questions")
+		return
+	}
+
+	response.OK(w, map[string]any{"exam": exam, "questions": questions})
+}
+
 // ─── Questions ────────────────────────────────────────────────────────────────
 
 func (h *Handler) AdminAddQuestion(w http.ResponseWriter, r *http.Request) {

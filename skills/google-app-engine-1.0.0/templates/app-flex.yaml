@@ -1,0 +1,42 @@
+# Google App Engine - Flexible Environment (Go + Firestore)
+
+runtime: go
+env: flex
+
+runtime_config:
+  operating_system: "ubuntu22"
+  runtime_version: "1.26"
+
+# Environment variables (NOT for secrets - use Secret Manager)
+env_variables:
+  APP_ENV: "production"
+  GOOGLE_CLOUD_PROJECT: "your-project-id"
+
+# Resource allocation
+resources:
+  cpu: 1
+  memory_gb: 0.5
+  disk_size_gb: 10
+
+# Scaling (min 1 instance in Flexible)
+automatic_scaling:
+  min_num_instances: 1
+  max_num_instances: 5
+  cool_down_period_sec: 120
+  cpu_utilization:
+    target_utilization: 0.65
+
+# Health checks
+liveness_check:
+  path: "/_ah/health"
+  check_interval_sec: 30
+  timeout_sec: 4
+  failure_threshold: 3
+  success_threshold: 2
+
+readiness_check:
+  path: "/_ah/health"
+  check_interval_sec: 5
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2

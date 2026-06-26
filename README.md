@@ -160,7 +160,8 @@ The API server starts on **http://localhost:8080**.
 
 ```bash
 # In a separate terminal
-gcloud emulators firestore start --host-port=127.0.0.1:8787
+# gcloud emulators firestore start --host-port=127.0.0.1:8787
+firebase emulators:start
 
 # Then set the emulator env var before starting the backend
 export FIRESTORE_EMULATOR_HOST="127.0.0.1:8787"

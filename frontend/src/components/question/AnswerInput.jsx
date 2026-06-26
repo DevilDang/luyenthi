@@ -9,19 +9,44 @@
 export default function AnswerInput({ question, value = {}, onChange, disabled }) {
   const { type, options = [] } = question
 
+  if (type === 'single_choice') {
+    const selected = value.options || []
+
+    return (
+      <div className="space-y-2 mt-3">
+        {options.map((opt) => {
+          const checked = selected.includes(opt.id)
+          return (
+            <label
+              key={opt.id}
+              className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                checked ? 'border-brand-500 bg-brand-50' : 'border-gray-200 hover:border-gray-300'
+              } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
+            >
+              <input
+                type="radio"
+                name={`q-${question.id}`}
+                checked={checked}
+                onChange={() => !disabled && onChange({ options: [opt.id] })}
+                className="accent-brand-500"
+                disabled={disabled}
+              />
+              <span className="text-sm">{opt.content}</span>
+            </label>
+          )
+        })}
+      </div>
+    )
+  }
+
   if (type === 'multiple_choice') {
-    const isMulti = question.allow_multiple
     const selected = value.options || []
 
     const toggle = (id) => {
-      if (isMulti) {
-        const next = selected.includes(id)
-          ? selected.filter((x) => x !== id)
-          : [...selected, id]
-        onChange({ options: next })
-      } else {
-        onChange({ options: [id] })
-      }
+      const next = selected.includes(id)
+        ? selected.filter((x) => x !== id)
+        : [...selected, id]
+      onChange({ options: next })
     }
 
     return (
@@ -36,7 +61,7 @@ export default function AnswerInput({ question, value = {}, onChange, disabled }
               } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
             >
               <input
-                type={isMulti ? 'checkbox' : 'radio'}
+                type="checkbox"
                 checked={checked}
                 onChange={() => !disabled && toggle(opt.id)}
                 className="accent-brand-500"

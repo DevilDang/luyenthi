@@ -1,6 +1,6 @@
 PROJECT_ID ?= $(shell grep GOOGLE_CLOUD_PROJECT backend/.env | cut -d= -f2)
 
-.PHONY: help setup dev-backend dev-frontend emulator build deploy logs
+.PHONY: help setup dev-backend dev-frontend emulator build deploy deploy-frontend deploy-all logs
 
 # ── Default ────────────────────────────────────────────────────────────────────
 help:
@@ -10,7 +10,9 @@ help:
 	@echo "  make dev-frontend   Run the Vite dev server"
 	@echo "  make emulator       Start the Firestore local emulator"
 	@echo "  make build          Build frontend into backend/static/"
-	@echo "  make deploy         Build + deploy to Google App Engine"
+	@echo "  make deploy         Build + deploy backend to Google App Engine"
+	@echo "  make deploy-frontend  Build + deploy frontend to Firebase Hosting"
+	@echo "  make deploy-all     Deploy both frontend (Firebase) and backend (App Engine)"
 	@echo "  make logs           Tail live App Engine logs"
 	@echo ""
 
@@ -59,6 +61,20 @@ deploy: build
 	cd backend && gcloud app deploy --quiet --project=$(PROJECT_ID)
 	@echo ""
 	@echo "Deployed! Open: https://$(PROJECT_ID).appspot.com"
+
+deploy-frontend:
+	@echo "→ Building frontend for Firebase Hosting…"
+	cd frontend && npm run build
+	@echo "→ Deploying to Firebase Hosting…"
+	firebase deploy --only hosting
+	@echo ""
+	@echo "Deployed! Open: https://$(PROJECT_ID).web.app"
+
+deploy-all: deploy-frontend
+	@echo "→ Deploying backend to App Engine (project: $(PROJECT_ID))…"
+	cd backend && gcloud app deploy --quiet --project=$(PROJECT_ID)
+	@echo ""
+	@echo "All done!"
 
 logs:
 	gcloud app logs tail -s default --project=$(PROJECT_ID)
